@@ -1,0 +1,27 @@
+---
+- name: Install and configure web server
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Install Apache web server
+      apt:
+        name: apache2
+        state: present
+
+    - name: Configure virtual host
+      copy:
+        src: apache.conf
+        dest: /etc/apache2/sites-available/
+      notify: restart Apache
+
+    - name: Create index.html file
+      copy:
+        content: "<html><body><h1>Hello World!</h1></body></html>"
+        dest: /var/www/html/index.html
+
+  handlers:
+    - name: restart Apache
+      service:
+        name: apache2
+        state: restarted
